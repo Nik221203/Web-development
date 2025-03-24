@@ -1,0 +1,37 @@
+body {
+    background-color: #832727;
+
+    background-image:"images/a.jpg";
+    background-size: cover; /* Makes the image cover the entire background */
+    background-position: center; /* Centers the image */
+    background-repeat: no-repeat; /* Prevents the image from repeating */
+    color: #0c0b0b; /* Adjust text color for better contrast */
+    }
+
+
+header {
+    border-bottom: 2px solid #aa1515;
+}
+
+footer {
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
+
+.jumbotron {
+    background-color: #e9ecef;
+    border-radius: 15px;
+}
+
+.card {
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: scale(1.05);
+}
+
+.table {
+    margin-top: 20px;
+}
