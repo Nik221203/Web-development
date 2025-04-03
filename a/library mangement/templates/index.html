@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Library Management</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="text-center">📚 Library Management System</h1>
+        <div class="text-end">
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('logout') }}" class="btn btn-danger">Logout</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="btn btn-primary">Login</a>
+                <a href="{{ url_for('register') }}" class="btn btn-success">Register</a>
+            {% endif %}
+        </div>
+        <hr>
+        
+        {% if current_user.is_authenticated and current_user.role == 'admin' %}
+            <a href="{{ url_for('add_book') }}" class="btn btn-info">➕ Add Book</a>
+        {% endif %}
+
+        <table class="table table-bordered mt-3">
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Copies</th>
+            </tr>
+            {% for book in books %}
+            <tr>
+                <td>{{ book.title }}</td>
+                <td>{{ book.author }}</td>
+                <td>{{ book.copies - book.issued }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>
