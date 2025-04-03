@@ -14,26 +14,44 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
 
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+
 @app.route("/")
 def home():
     books = Book.query.all()
-    return render_template("index.html", books=books)
+    form = LoginForm()  # Add this
+    return render_template("index.html", books=books, form=form)
+
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
-        hashed_password = generate_password_hash(form.password.data)
-        new_user = User(username=form.username.data, password=hashed_password)
+        # Check if username already exists
+        existing_user = User.query.filter_by(username=form.username.data).first()
+        if existing_user:
+            flash("Username already taken. Please choose another one.", "danger")
+            return redirect(url_for("register"))
+
+        # Hash the password securely
+        hashed_password = generate_password_hash(form.password.data, method="pbkdf2:sha256")
+
+        # Create new user (default role is 'user', but you can change this)
+        new_user = User(username=form.username.data, password=hashed_password, role="user")
+
+        # Save to database
         db.session.add(new_user)
         db.session.commit()
+
         flash("Registration successful! Please log in.", "success")
         return redirect(url_for("login"))
+
     return render_template("register.html", form=form)
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -46,11 +64,13 @@ def login():
         flash("Invalid credentials!", "danger")
     return render_template("login.html", form=form)
 
+
 @app.route("/logout")
 @login_required
 def logout():
     logout_user()
     return redirect(url_for("home"))
+
 
 @app.route("/add_book", methods=["GET", "POST"])
 @login_required
@@ -58,7 +78,7 @@ def add_book():
     if current_user.role != "admin":
         flash("Only admins can add books!", "danger")
         return redirect(url_for("home"))
-    
+
     form = BookForm()
     if form.validate_on_submit():
         new_book = Book(title=form.title.data, author=form.author.data, copies=form.copies.data)
@@ -66,8 +86,9 @@ def add_book():
         db.session.commit()
         flash("Book added successfully!", "success")
         return redirect(url_for("home"))
-    
+
     return render_template("add_book.html", form=form)
+
 
 if __name__ == "__main__":
     with app.app_context():
