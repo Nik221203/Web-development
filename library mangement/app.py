@@ -44,7 +44,7 @@ class RegisterForm(FlaskForm):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# Routes
+
 @app.route('/')
 def home():
     books = Book.query.all()
